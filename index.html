@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Street Food Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #fff5e6;
+            color: #333;
+        }
+        header {
+            background: linear-gradient(135deg, #FF5722, #FF8A65);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.8rem;
+            margin: 0;
+        }
+        .container {
+            padding: 20px;
+            text-align: center;
+        }
+        input {
+            padding: 12px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 25px;
+            margin-right: 10px;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        button {
+            background-color: #FFD54F;
+            color: #333;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #FFB300;
+        }
+        .filters {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .filters select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+        .results {
+            margin-top: 30px;
+        }
+        .results ul {
+            list-style: none;
+            padding: 0;
+        }
+        .results li {
+            background: white;
+            padding: 15px;
+            margin: 10px auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-size: 1rem;
+            text-align: left;
+        }
+        .results h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            color: #FF5722;
+        }
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .virtual-tour {
+            margin-top: 30px;
+            padding: 20px;
+            text-align: center;
+            background: #FF5722;
+            color: white;
+            border-radius: 10px;
+        }
+        .virtual-tour button {
+            background: white;
+            color: #FF5722;
+            font-size: 1rem;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+        .virtual-tour button:hover {
+            background-color: #FFD54F;
+            color: #333;
+        }
+        .feedback {
+            margin-top: 30px;
+            padding: 20px;
+            text-align: center;
+            background: #4CAF50;
+            color: white;
+            border-radius: 10px;
+        }
+        .feedback button {
+            background: white;
+            color: #4CAF50;
+            font-size: 1rem;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+        .feedback button:hover {
+            background-color: #AED581;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Street Food Guide</h1>
+    </header>
+    <div class="container">
+        <h2>Discover the Best Street Food</h2>
+        <p>Enter your location and let us do the rest!</p>
+        <input type="text" id="locationInput" placeholder="Enter your location">
+        <button onclick="searchFood()">Search</button>
+        <button onclick="useMyLocation()">Use My Location</button>
+        <div class="filters">
+            <select id="cuisineFilter">
+                <option value="">Cuisine Type</option>
+                <option value="Thai">Thai</option>
+                <option value="Mexican">Mexican</option>
+                <option value="Japanese">Japanese</option>
+            </select>
+            <select id="ratingFilter">
+                <option value="">Rating</option>
+                <option value="4">4+ Stars</option>
+                <option value="3">3+ Stars</option>
+                <option value="2">2+ Stars</option>
+            </select>
+            <select id="priceFilter">
+                <option value="">Price Range</option>
+                <option value="$">$</option>
+                <option value="$$">$$</option>
+                <option value="$$$">$$$</option>
+            </select>
+        </div>
+        <div id="map"></div>
+        <div class="results" id="results"></div>
+        <div class="virtual-tour">
+            <h2>Take a Virtual Food Tour</h2>
+            <p>Experience the ambiance of top street food spots through 360° views and videos.</p>
+            <button>Explore Now</button>
+        </div>
+        <div class="feedback">
+            <h2>Share Your Experience</h2>
+            <p>Help us improve by sharing your street food adventures and suggestions!</p>
+            <button>Give Feedback</button>
+        </div>
+    </div>
+    <script>
+        function initMap() {
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 8,
+            });
+        }
+
+      function searchFood() {
+    const location = document.getElementById('locationInput').value;
+    const resultsDiv = document.getElementById('results');
+
+    if (location) {
+        resultsDiv.innerHTML = `<p>Searching for the best street food in <strong>${location}</strong>...</p>`;
+        
+        // Fetch data from Flask backend
+        fetch('/api/food')
+            .then(response => response.json())
+            .then(data => {
+                // Filter results based on the entered location
+                const filteredData = data.filter(item => item.location.toLowerCase().includes(location.toLowerCase()));
+
+                if (filteredData.length > 0) {
+                    resultsDiv.innerHTML = `<h2>Top Street Food Spots in ${location}</h2>`;
+                    const list = document.createElement('ul');
+                    filteredData.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = `${item.name} - Rating: ${item.rating}, Reviews: ${item.reviews}`;
+                        list.appendChild(li);
+                    });
+                    resultsDiv.appendChild(list);
+                } else {
+                    resultsDiv.innerHTML = `<p>No results found for <strong>${location}</strong>.</p>`;
+                }
+            })
+            .catch(error => {
+                resultsDiv.innerHTML = '<p style="color: red;">Error fetching results.</p>';
+                console.error(error);
+            });
+    } else {
+        resultsDiv.innerHTML = '<p style="color: red;">Please enter a location.</p>';
+    }
+}
+
+
+        function useMyLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const resultsDiv = document.getElementById('results');
+                    resultsDiv.innerHTML = `<p>Fetching food spots near your location (${lat.toFixed(2)}, ${lon.toFixed(2)})...</p>`;
+                    // Simulated API response
+                    setTimeout(() => {
+                        resultsDiv.innerHTML = `
+                            <h2>Top Street Food Spots Nearby</h2>
+                            <ul>
+                                <li><strong>Spicy Ramen House</strong> - A burst of umami flavors. Cuisine: Japanese</li>
+                                <li><strong>Cheese Heaven</strong> - Gourmet grilled cheese perfection. Cuisine: Western</li>
+                                <li><strong>Gelato Galaxy</strong> - Creamy, cold, and delightful. Cuisine: Dessert</li>
+                            </ul>
+                        `;
+                    }, 2000);
+                });
+            } else {
+                alert('Geolocation is not supported by your browser.');
+            }
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async></script>
+</body>
+</html>
